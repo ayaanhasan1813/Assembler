@@ -13,12 +13,12 @@
 
 
 # uncomment these 2 lines if you want to read your own ( custom )input file
-with open('test_case1.txt') as f:  # here test_case1.txt is an input file with assembly code 
+with open('test_case2.txt') as f:  # here test_case1.txt is an input file with assembly code 
     code = f.read().splitlines()
 
 # ACTUAL CODE STARTS FORM HERE  
 
-#dictionary to map registers with their code
+#dictionary to map registers with their code (ISA has 7 general purpose registers with one flag register)
 RegAddress = {
   "R0":"000",
   "R1":"001",
@@ -423,4 +423,4 @@ for line in code:
         print(s)
 
 
-# ********************************THE END*********************************************************************
+# ***********************************************THE END********************************************************************

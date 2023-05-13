@@ -1,0 +1,2 @@
+mov R1 $12
+end: hlt
