@@ -31,10 +31,10 @@ RegAddress = {
 
 
 operations = {
-   "add":["00000","A"],
-   "sub":["00001","A"],
+   "add":["00000","A"], # Performs reg1 = reg2 + reg3. If the computation overflows, then the overflow flag is set and 0 is written in reg1
+   "sub":["00001","A"], # Performs reg1 = reg2- reg3. In case reg3 > reg2, 0 is written to reg1 and overflow flag is set.
    "mov1":["00010","B"], # mov immediate
-   "mov2":["00011","C"],
+   "mov2":["00011","C"], # mov immediate but with register
    "ld":["00100","D"],
    "st":["00101","D"],
    "mul":["00110","A"],
