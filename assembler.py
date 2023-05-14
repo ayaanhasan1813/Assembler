@@ -35,22 +35,22 @@ operations = {
    "sub":["00001","A"], # Performs reg1 = reg2- reg3. In case reg3 > reg2, 0 is written to reg1 and overflow flag is set.
    "mov1":["00010","B"], # mov immediate
    "mov2":["00011","C"], # mov immediate but with register
-   "ld":["00100","D"],
-   "st":["00101","D"],
-   "mul":["00110","A"],
-   "div":["00111","C"],
-   "rs":["01000","B"],
-   "ls":["01001","B"],
-   "xor":["01010","A"],
-   "or":["01011","A"],
-   "and":["01100","A"],
-   "not":["01101","C"],
-   "cmp":["01110","C"],
-   "jmp":["01111","E"],
-   "jlt":["10000","E"],
-   "jgt":["10001","E"],
-   "je":["10010","E"],
-   "hlt":["10011","F"]
+   "ld":["00100","D"], # Loads data from mem_addr into reg1.
+   "st":["00101","D"], # Stores data from reg1 to mem_addr.
+   "mul":["00110","A"], # Performs reg1 = reg2 x reg3. If the computation overflows, then the overflow flag is set and 0 is written in reg1
+   "div":["00111","C"], # Performs reg3/reg4. Stores the quotient in R0 and the remainder in R1. If reg4 is 0 then overflow flag is set and content of R0 and R1 are set to 0
+   "rs":["01000","B"], # Right shifts reg1 by $Imm, where $Imm is a 7 bit value.
+   "ls":["01001","B"], # Left shifts reg1 by $Imm, where $Imm is a 7 bit value.
+   "xor":["01010","A"], # Performs bitwise XOR of reg2 and reg3. Stores the result in reg1.
+   "or":["01011","A"], # Performs bitwise OR of reg2 and reg3. Stores the result in reg1.
+   "and":["01100","A"], # Performs bitwise AND of reg2 and reg3. Stores the result in reg1.
+   "not":["01101","C"], # Performs bitwise NOT of reg2. Stores the result in reg1.
+   "cmp":["01110","C"], # Compares reg1 and reg2 and sets up the FLAGS register.
+   "jmp":["01111","E"], # Jumps to mem_addr, where mem_addr is a memory address.
+   "jlt":["10000","E"], # Jump to mem_addr if the less than flag is set (less than flag = 1), where mem_addr is a memory address.
+   "jgt":["10001","E"], # Jump to mem_addr if the greater than flag is set (greater than flag = 1), where mem_addr is a memory address.
+   "je":["10010","E"], # Jump to mem_addr if the equal flag is set (equal flag = 1), where mem_addr is a memory address.
+   "hlt":["10011","F"] # Stops the machine from executing until reset
 }
 
 operations_symbol = ["add","sub","mov","ld","st","mul","div","rs","ls",
@@ -62,7 +62,19 @@ labels=["hlt"]
 variables=[]
 error=False
 
-
+# ------------------------------------------------------------------------------------------------------
+# making flag using : 
+# FLAGS semantics
+# The semantics of the flags register are:
+# ● Overflow (V): This flag is set by {add, sub, mul, div} when the result of the operation
+# overflows. This shows the overflow status for the last executed instruction.
+# ● Less than (L): This flag is set by the “cmp reg1 reg2” instruction if reg1 < reg2
+# ● Greater than (G): This flag is set by the “cmp reg1 reg2” instruction if the value of
+# reg1 > reg2
+# ● Equal (E): This flag is set by the “cmp reg1 reg2” instruction if reg1 = reg2
+# The default state of the FLAGS register is all zeros. If an instruction does not set the
+# FLAGS register after the execution, the FLAGS register is reset to zeros.
+# ------------------------------------------------------------------------------------------------------
 #**********************************************************************************************************************************************
                                #***THIS IS ERROR HANDLING PART*** 
     # this piece of code will detect any syntax error in the input assembly code and display the error 
@@ -393,8 +405,10 @@ d32 = f4()
 for line in code:                                               
     line_no+=1
     if(len(line)==0):
+        # if line is empty then continue
         continue
     value = list(line.split())
+    # else split it and store it in the list
     d32 = f4()
     handle_variables(value)
     a13 = f1()
