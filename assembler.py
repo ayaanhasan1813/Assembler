@@ -344,9 +344,11 @@ def handle_variables(value):
     if value[0]=="var":
         d32 = f4()
         if(flag==1):
-            print("line no", line_no , "variable not decalared in the beginning of code ",sep=' ')
+            # if the variable is not defined and we are trying to acccess it
+            print("line no", line_no , "we are trying to access a variable that is not defined in the starting ",sep=' ')
             error=True
         if(value[1] in variables):
+            # if there are multiple declarations of a variable
             d32 = f4()
             print("line no", line_no , "mulitiple declaration of variable " , value[1] , sep=' ')
             error = True
