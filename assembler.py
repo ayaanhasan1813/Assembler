@@ -9,11 +9,17 @@
 
 
 # ------------------------------------------taking input throught a text file contating assemble code------------------------------------------------------
-with open('test_case1.txt') as f:  
+with open('t1.txt') as f:  
     code = f.read().splitlines() 
 
 # -----------------------------------------------input code ends---------------------------------------------
- 
+ # ACTUAL CODE STARTS FORM HERE  
+
+main_lst=[]
+for i in code:
+    a=i.split(' ')
+    main_lst.append(a)
+le=len(main_lst)
 
 
 # making a dictionary with register 0,1,2,3,4,5,6 mapped to there binary code 
@@ -52,15 +58,16 @@ operations = {
    "je":["10010","E"], # Jump to mem_addr if the equal flag is set (equal flag = 1), where mem_addr is a memory address.
    "hlt":["10011","F"] # Stops the machine from executing until reset
 }
-
-operations_symbol = ["add","sub","mov","ld","st","mul","div","rs","ls",
+opr_sym = ["add","sub","mov","ld","st","mul","div","rs","ls",
                    "xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]
 
-registers = [ "R0", "R1" , "R2" , "R3" , "R4" , "R5" , "R6"]
-registers_flag= [ "R0", "R1" , "R2" , "R3" , "R4" , "R5" , "R6" , "FLAGS"]
+reg = [ "R0", "R1" , "R2" , "R3" , "R4" , "R5" , "R6"]
+flags= [ "R0", "R1" , "R2" , "R3" , "R4" , "R5" , "R6" , "FLAGS"]
 labels=["hlt"]
-variables=[]
+lab=[]
+var=[]
 error=False
+
 
 # ------------------------------------------------------------------------------------------------------
 # making flag using : 
@@ -118,402 +125,166 @@ import numpy as np
 
 
 def f4():
-    matrix = [[0,0,3],[0,5,6],[0,8,9]]
-    m = len(matrix)
-    n = len(matrix[0])
+    operaion3 = [[0,0,3],[0,5,6],[0,8,9]]
+    m = len(operaion3)
+    n = len(operaion3[0])
     lead = 0
     for r in range(m):
         if lead >= n:
             return
         i = r
-        while matrix[i][lead] == 0:
+        while operaion3[i][lead] == 0:
             i += 1
             if i == m:
                 i = r
                 lead += 1
                 if lead == n:
                     return
-        matrix[i], matrix[r] = matrix[r], matrix[i]
-        lv = matrix[r][lead]
-        matrix[r] = [mrx / float(lv) for mrx in matrix[r]]
+        operaion3[i], operaion3[r] = operaion3[r], operaion3[i]
+        lv = operaion3[r][lead]
+        operaion3[r] = [mrx / float(lv) for mrx in operaion3[r]]
         for i in range(m):
             if i != r:
-                lv = matrix[i][lead]
-                matrix[i] = [iv - lv * rv for rv, iv in zip(matrix[r], matrix[i])]
+                lv = operaion3[i][lead]
+                operaion3[i] = [iv - lv * rv for rv, iv in zip(operaion3[r], operaion3[i])]
         lead += 1
     return 
 
 #---------------------------------------helper function ---------------------------------------------------
 
 
-#*************************** THIS FUCTION CHECKS ERROR IN IMMEDIATE VALUES ********************************************#
-def check_immediate(a):
-    f1()
-    global error
-    try:
-        a13 = f1()
-        a80 = f2()
-        a123 = a13 + a80
-        n = int(a[1:])
-        if(n<0 or n>255):
-            print("line no" , line_no , n ,"is not in range [0, 255] ", sep=' ')
-            error=True
+#******************************************************************************************************************#
 
-    except:
-        print("line no" , line_no , "invalid immediate value", sep=' ')
-        error=True
+# checking error in immediate values
+c=0
+for j in main_lst:
+    c+=1
+    l=len(j)
+    if(j!=['']):
+        dol=j[l-1]
+        if (dol[0]=='$'):
+            n = int(dol[1:])
+            if (n<0 or n>256):
+                print(f"error invalid immidiate value entered {c}.")
 
+# checking for typos in reg_names and opr_symbols
+c=0
+for j in main_lst:
+    c+=1
+    if(j!=['']):
+        for i in j:
+            if(i[0]=='R'):
+                a=i
+                if(a not in reg):
+                    print(f"error invalid register entered {c}.")
 
+# checking for typos in opr_symbols
+c=0
+for j in main_lst:
+    c+=1
+    if(j!=['']):
+    #var not declred at top how
+        if(j[0] not in opr_sym and (j[0]!='var' and ':' not in j[0])):
+            print(f"error invalid operation symbol is used {c}.")
 
-#**************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE A *******************************************#
-def type_A(value):
-    global error
-    if(len(value)!=4):
-        print("line no" , line_no , " wrong syntax used for", value[0],"instruction",sep=' ' )
-        error=True
-        return
-    f1()
-    for i in range(1,len(value)):
-        if(value[i]=="FLAGS"):
-            a13 = f1()
-            a80 = f2()
-            a123 = a13 + a80
-            print("line no" , line_no, " invalid use of flags ",sep=' ')
-            error=True
+#*************************************************************************************************************************************
+# adding labels 
+for j in main_lst:
+    for i in j:
+        if(':' in i):
+            labels.append(i)
+            a=i.strip(':')
+            lab.append(a)
 
-        elif(value[i] not in registers):
-            f2()
-            print("line no" , line_no ,'(',value[i],')', "is invalid register name ",sep=' ')
-            f3()
-            error=True
+# adding variable to list var
+for j in main_lst:
+    if(j[0]=='var'):
+        try:
+            var.append(j[1])
+        except:
+            print("error variable not declared")
 
+#***********************************************************************************************************************************
 
+# checking if all variables are on top
+c_out=0
+j=0
+while(main_lst[j][0]=='var' and j<le):
+    c_out+=1
+    j+=1
 
-#*************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE B ****************************************#
-def type_B(value):
-    global error
-    d32 = f4()
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if(len(value)!=3):
-        a13 = f1()
-        a80 = f2()
-        a123 = a13 + a80
-        print("line no" , line_no , " wrong syntax used for", value[0],"instruction",sep=' ' )
-        error=True
-        d32 = f4()
-        return   
+c_var=c_out
 
-    if(value[1]=="FLAGS"):
-        d32 = f4()
-        print("line no" , line_no, " invalid use of flags ",sep=' ')
-        error=True
+for j in range(c_out, le-1):
+    if(main_lst[j][0]=='var'):
+        c_var+=1
+if (c_var>c_out):
+    print("error declare variables at the top")
 
-    elif(value[1] not in registers):
-        d32 = f4()
-        print("line no" , line_no ,'(',value[1],')', "is invalid register name ",sep=' ')
-        error=True
-        
-    a = value[2]
-    if(a[0]!="$"):
-        print("line no", line_no , "use of " , a[0] , "is invalid" , sep=' ')
-        error=True
+#************************************************************************************************************************************
+
+# checking for use of undefined variables and use of labels as variables
+c=0
+try:
+    for j in main_lst:
+        c+=1
+        k=len(j)
+        if ((j[0]=='ld' or j[0]=='st' or j[0] in lab) and j[k-1] in lab and j[0]!='end:'):
+            print(f"error can't use labels as variables in line {c}")
+except:
+    for j in main_lst:
+        c+=1
+        l=len(j)
+        if(j[l-1] not in var and (j[0]=='ld' or j[0]=='st' or j[0] in labels) and j[0]!='end:'):
+            print(f"error undefined variable used in line {c}.")
+
+#**************************************************************************************************************************************
+
+# checking for undefined labels
+c=0
+try:
+    for j in main_lst:
+        c+=1
+        for i in j:
+            if(':' in i and i not in labels):
+                print(f"error label is undefined in line {c}")
+except:
+    for j in main_lst:
+        if(':' in j[0] and j[0] in var):
+            print("error can't use varibales as labels")
+
+#**************************************************************************************************************************************
+
+#checking for multiple variable declaration
+repeat=[]
+for j in var:
+    if (j in repeat):
+        print(f"error repeating variable {j}") 
     else:
-        check_immediate(a)
+        repeat.append(j)
 
-
-#*************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE C ****************************************#
-def type_C(value):
-    global error
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if(len(value)!=3):
-        d32 = f4()
-        print("line no" , line_no , " wrong syntax used for type C instruction",sep=' ' )
-        error=True
-        return
-
-    if(value[1]=="FLAGS"):
-        d32 = f4()
-        print("line no" , line_no, " invalid use of flags ",sep=' ')
-        error=True
-
-    elif(value[1] not in registers):
-        d32 = f4()
-        print("line no" , line_no ,'(',value[1],')', "is invalid register name ",sep=' ')
-        error=True
-
-    if(value[0]=="mov2" and value[2] not in registers_flag):
-        d32 = f4()
-        print("line no" , line_no , " invalid register or flag name ",sep=' ')
-        error=True
-
-    elif value[0]!="mov2" and value[2] not in registers:
-        d32 = f4()
-        print("line no",line_no,"invalid register name",sep=' ')
-        error=True
-
-
-
-#*************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE D *****************************************#
-def type_D(value):
-    global error
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if(len(value)!=3):
-        d32 = f4()
-        print("line no" , line_no , " wrong syntax used for", value[0],"instruction",sep=' ' )
-        error=True
-        return
-        
-    if(value[2] in labels):
-        d32 = f4()
-        print("line no", line_no , "labels cannot be used inplace of variables", sep=' ')
-        error=True
-
-    elif(value[2] not in variables):
-        d32 = f4()
-        print("line no" , line_no , '(',value[2] ,')'," is undefined variable",sep=' ')
-        error=True
-
-
-
-#*************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE E *******************************************#
-def type_E(value):
-    global error
-    if(len(value)!=2):
-        d32 = f4()
-        print("line no" , line_no , " wrong syntax used for", value[0],"instruction",sep=' ' )
-        error=True
-        return
-
-    if(value[1] in variables):
-        d32 = f4()
-        print("line no", line_no , "variables cannot be used inplace of labels", sep=' ')
-        error=True
-            
-    elif(value[1] not in labels):
-        d32 = f4()
-        print("line no" , line_no , '(',value[1],')' ," is undefined label ",sep=' ')
-        error=True
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-
-
-#*************************** THIS FUNCTION HANDLES ALL ERROR CASES OF TYPE F *********************************************#
-def type_F(value):
-    if(line_no!=len(code)):
-        d32 = f4()
-        print("line no", line_no , "hlt must be at the end",sep=' ')
-        error=True
-
-    elif(len(value)!=1):
-        d32 = f4()
-        print("line no" , line_no , " wrong syntax used for", value[0],"instruction",sep=' ' )
-        error=True
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-
-
-#***************************** THIS IS HELPER FUNCTION TO HANDLE CASES OF VARIABLES ***************************************#
-def handle_variables(value):
-    global error
-    global flag
-    if(value[0]!="var"):
-        d32 = f4()
-        flag=1
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-    if value[0]=="var" and len(value)!=2:
-        d32 = f4()
-        print("line no",line_no,"invalid syntax",sep=' ')
-        error=True
-        return
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if value[0]=="var":
-        d32 = f4()
-        if(flag==1):
-            # if the variable is not defined and we are trying to acccess it
-            print("line no", line_no , "we are trying to access a variable that is not defined in the starting ",sep=' ')
-            error=True
-        if(value[1] in variables):
-            # if there are multiple declarations of a variable
-            d32 = f4()
-            print("line no", line_no , "mulitiple declaration of variable " , value[1] , sep=' ')
-            error = True
-        else:
-            variables.append(value[1])   
-
-
-#*********************************THIS HELPER FUNCTION TO HANDLE CASES OF LABELS ********************************#
-def handle_labels(value):
-    global error
-    if(value[0][-1]==":"):
-        d32 = f4()
-        a13 = f1()
-        a80 = f2()
-        a123 = a13 + a80
-        if(value[0][0:-1] in labels):
-            d32 = f4()
-            print("line no", line_no , "multiple definations of label " ,'(', value[0],')',sep=' ')
-            error=True
-        else:
-            labels.append(value[0][0:-1])
-            a13 = f1()
-            a80 = f2()
-            a123 = a13 + a80
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-
-#**********************************THIS IS HELPER FUNCTION TO HANDLE HALT *********************************************#
-def handle_hlt(value):
-    global error
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if(len(value)==2 ):
-        d32 = f4()
-        if value[1]!="hlt":
-            print("line no" ,line_no +1 ," no hlt instruction at the end ", sep=' ')
-            d32 = f4()
-            error=True
-
-    elif(value[0]!="hlt"):
-        print("line no" ,line_no +1 ," no hlt instruction at the end ", sep=' ')
-        error=True
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-
-
-#HANDLING ALL CASES OF VARIABLES 
-line_no =0 
-flag=0
-d32 = f4()
-for line in code:                                               
-    line_no+=1
-    if(len(line)==0):
-        # if line is empty then continue
-        continue
-    value = list(line.split())
-    # else split it and store it in the list
-    d32 = f4()
-    handle_variables(value)
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-
-
-# HANDLING ALL CASES OF LABELES 
-line_no=0                                                         
-for line in code:    
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80    
-    d32 = f4()      
-    line_no+=1
-    if(len(line)==0):
-        continue
-    value = list(line.split())
-    d32 = f4()
-    handle_labels(value)
-
-
-
- # HANDLING ALL CASES OF NORMAL INSTRUCTIONS
-line_no=0                                                      
-for line in code:
-    line_no+=1
-    d32 = f4()
-    if(len(line)==0):
-        continue
-
-    value = list(line.split())
-    d32 = f4()
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-    if line_no==len(code):
-        handle_hlt(value)
-
-    if(value[0]=="var"):
-        d32 = f4()
-        continue
-
-    if(value[0][0:-1] in labels):
-        value.pop(0)
-
-    if(len(value)==0):
-        print("line no", line_no , "invalid defnation of labels",sep=' ')
-        d32 = f4()
-        error=True
-        continue
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    
-    if(value[0] not in operations_symbol):
-        d32 = f4()
-        print("line no",line_no , '(',value[0],')'," is invalid instruction name ", sep=' ')
-        error=True
-        continue
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-
-    if(value[0]=="mov" and len(value)>=2):
-        d32 = f4()
-        c = value[2][0]
-        d32 = f4()
-        if(65<=ord(c)<=90 or 97<=ord(c)<=122):
-            value[0]="mov2"
-        else:
-            value[0]="mov1"
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    
-    if (operations[value[0]][1] == "A"):
-        d32 = f4()
-        type_A(value)
-            
-    elif (operations[value[0]][1] == "C"):
-        type_C(value)
-        d32 = f4()
-        
-    elif (operations[value[0]][1] == "B"):
-        type_B(value)
-
-    elif (operations[value[0]][1] == "D"):
-        d32 = f4()
-        type_D(value)
-    
-    elif (operations[value[0]][1] == "E"):
-        type_E(value)
-
-    elif (operations[value[0]][1] == "F"):
-        type_F(value)
-
+# checking for multiple labels used
+repeat=[]
+for j in labels:
+    if(j in repeat):
+        print(f"error repeating label {j}")
     else:
-        d32 = f4()
-        print("line no",line_no,"invalid syntax",sep=' ')
-        error=True
+        repeat.append(j)
+
+#******************************************************************************************************************#
+
+# checking for not using hlt missing and at end
+c=0
+for j in main_lst:
+    if ('hlt' not in j):
+        c+=1
+
+try:
+    if(c==le):
+        print("error hlt is missing")
+except:
+    if ('hlt' not in main_lst[le-1]):
+        print("error hlt not used at end")
 
 
                           # this is printing the binary code part 
@@ -540,7 +311,7 @@ for line in code:
     d32 = f4()
     value = list(line.split())
     
-    if(value[0] in operations_symbol):
+    if(value[0] in opr_sym):
         address+=1
 
     if value[0]=="hlt":
@@ -579,11 +350,11 @@ for line in code:
             continue
 
         value = list(line.split())
-        if len(value) > 1 and value[0] in labels and value[1] in operations_symbol:
+        if len(value) > 1 and value[0] in labels and value[1] in opr_sym:
             value.pop(0)
 
         operation = value[0]
-        if operation in operations_symbol:
+        if operation in opr_sym:
             # matching the values with op_mnemoics
             case = operations[operation][1]
 
@@ -625,4 +396,4 @@ for line in code:
 
 
 
-# ***********************************************THE END********************************************************************
+# ***********************************************THE END*****************************************************
