@@ -571,68 +571,56 @@ for line in code:
 
 #********************************* THIS IS MAIN LOOP TO COVERT ASSEMBLY INTO BINARY CODE *******************************
 for line in code:
-    a13 = f1()
-    a80 = f2()
-    a123 = a13 + a80
-    if(len(line)==0):
-        # there is a empty line that means we can continue
-        d32 = f4()
-        continue
+    try:
+        if len(line) == 0:
+            # there is an empty line, continue
+            continue
 
-    value = list(line.split())
-    if( len(value)>1 and value[0] in labels and value[1] in operations_symbol):
-        value.pop(0)
+        value = list(line.split())
+        if len(value) > 1 and value[0] in labels and value[1] in operations_symbol:
+            value.pop(0)
 
-    if (value[0] in operations_symbol):
-        # matching the values with op_mnemoics
+        operation = value[0]
+        if operation in operations_symbol:
+            # matching the values with op_mnemoics
+            case = operations[operation][1]
 
-        if(value[0]=="mov" ):
-            if(value[2][0]=="$"):
-                value[0]="mov1"
-                d32 = f4()
-            else:
-                value[0]="mov2"
+            if case == "B":
+                a = value[1]
+                b = value[2][1:]
+                b1 = bin(int(b))[2:]
+                s = operations[operation][0] + RegAddress[a] + (8 - len(b1)) * "0" + b1
 
-        if (operations[value[0]][1] == "B"):
-            a = value[1]
-            b = value[2][1:]
-            b1 = bin(int(b))[2:]
-            d32 = f4()
-            s = operations[value[0]][0] + RegAddress[a] + (8-len(b1))*"0" + b1
+            elif case == "A":
+                a = value[1]
+                b = value[2]
+                c = value[3]
+                s = operations[operation][0] + "00" + RegAddress[a] + RegAddress[b] + RegAddress[c]
 
-        elif (operations[value[0]][1] == "A"):
-            a = value[1]
-            b = value[2]
-            c = value[3]
-            d32 = f4()
-            s = operations[value[0]][0] + "00" + RegAddress[a] + RegAddress[b] + RegAddress[c]
-    
-        elif (operations[value[0]][1] == "C"):
-            a = value[1]
-            b = value[2]
-            d32 = f4()
-            s = operations[value[0]][0] + "00000" + RegAddress[a] + RegAddress[b]
+            elif case == "C":
+                a = value[1]
+                b = value[2]
+                s = operations[operation][0] + "00000" + RegAddress[a] + RegAddress[b]
 
-        elif (operations[value[0]][1] == "D"):
-            a = value[1]
-            b = bin(variables[value[2]])[2:]
-            d32 = f4()
-            s = operations[value[0]][0] + RegAddress[a] + (8 - len(b)) * "0" + b
+            elif case == "D":
+                a = value[1]
+                b = bin(variables[value[2]])[2:]
+                s = operations[operation][0] + RegAddress[a] + (8 - len(b)) * "0" + b
 
-        elif (operations[value[0]][1] == "E"):
-            a=value[1]
-            b=bin(labels[a+":"])[2:]
-            d32 = f4()
-            s=operations[value[0]][0] + "000" + (8 - len(b)) * "0" + b
+            elif case == "E":
+                a = value[1]
+                b = bin(labels[a+":"])[2:]
+                s = operations[operation][0] + "000" + (8 - len(b)) * "0" + b
 
-        elif (operations[value[0]][1] == "F"):
-            s = operations[value[0]][0] + "00000000000"
-            d32 = f4()
-        d32 = f4()
-        print(s)
-        a13 = f1()
-        a80 = f2()
-        a123 = a13 + a80
+            elif case == "F":
+                s = operations[operation][0] + "00000000000"
+
+            print(s)
+
+    except KeyError as e:
+        pass
+        # print(f"KeyError: {str(e)} occurred while processing line: {line}")
+
 
 
 # ***********************************************THE END********************************************************************
