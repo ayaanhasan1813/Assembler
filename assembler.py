@@ -7,18 +7,17 @@
             Kanishk kumar meena
 '''
 
-# uncomment these 2 lines for taking a file as an input through console
-# import sys                                    
-# code = sys.stdin.read().splitlines()
+
+# ------------------------------------------taking input throught a text file contating assemble code------------------------------------------------------
+with open('test_case1.txt') as f:  
+    code = f.read().splitlines() 
+
+# -----------------------------------------------input code ends---------------------------------------------
+ 
 
 
-# uncomment these 2 lines if you want to read your own ( custom )input file
-with open('test_case1.txt') as f:  # here test_case1.txt is an input file with assembly code 
-    code = f.read().splitlines()
-
-# ACTUAL CODE STARTS FORM HERE  
-
-#dictionary to map registers with their code (ISA has 7 general purpose registers with one flag register)
+# making a dictionary with register 0,1,2,3,4,5,6 mapped to there binary code 
+# there are total 7 general purpose register and one flag register
 RegAddress = {
   "R0":"000",
   "R1":"001",
@@ -30,11 +29,11 @@ RegAddress = {
   "FLAGS":"111"
 }
 
-# dictionary to map instructions with their opcode and type
+
 operations = {
    "add":["00000","A"],
    "sub":["00001","A"],
-   "mov1":["00010","B"],
+   "mov1":["00010","B"], # mov immediate
    "mov2":["00011","C"],
    "ld":["00100","D"],
    "st":["00101","D"],
@@ -562,6 +561,7 @@ for line in code:
     a80 = f2()
     a123 = a13 + a80
     if(len(line)==0):
+        # there is a empty line that means we can continue
         d32 = f4()
         continue
 
@@ -570,6 +570,7 @@ for line in code:
         value.pop(0)
 
     if (value[0] in operations_symbol):
+        # matching the values with op_mnemoics
 
         if(value[0]=="mov" ):
             if(value[2][0]=="$"):
