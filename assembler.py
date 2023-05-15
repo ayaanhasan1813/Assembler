@@ -2,7 +2,7 @@
     CSE 112 - Computer Organisation group project.
         group members :
             Aditya Sharma
-            Ayan kumar
+            Ayaan kumar
             Aayan hasan
             Kanishk kumar meena
 '''
@@ -14,6 +14,7 @@ with open('test_case1.txt') as f:
 
 # -----------------------------------------------input code ends---------------------------------------------
  # ACTUAL CODE STARTS FORM HERE  
+
 
 main_lst=[]
 for i in code:
@@ -156,6 +157,7 @@ def f4():
 #******************************************************************************************************************#
 
 # checking error in immediate values
+
 c=0
 for j in main_lst:
     c+=1
@@ -264,6 +266,7 @@ for j in var:
         repeat.append(j)
 
 # checking for multiple labels used
+
 repeat=[]
 for j in labels:
     if(j in repeat):
