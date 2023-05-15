@@ -3,7 +3,7 @@
         group members :
             Aditya Sharma
             Ayaan kumar
-            Aayan hasan
+            Ayaan hasan
             Kanishk kumar meena
 '''
 
@@ -210,6 +210,7 @@ for j in main_lst:
 #***********************************************************************************************************************************
 
 # checking if all variables are on top
+
 c_out=0
 j=0
 while(main_lst[j][0]=='var' and j<le):
