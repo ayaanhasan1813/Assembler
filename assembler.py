@@ -4,7 +4,7 @@
             Aditya Sharma
             Ayan kumar
             Aayan hasan
-            Kanishk Mera hai
+            Kanishk kumar meena
 '''
 
 
