@@ -9,7 +9,7 @@
 
 
 # ------------------------------------------taking input throught a text file contating assemble code------------------------------------------------------
-with open('t1.txt') as f:  
+with open('test_case1.txt') as f:  
     code = f.read().splitlines() 
 
 # -----------------------------------------------input code ends---------------------------------------------
@@ -53,10 +53,10 @@ operations = {
    "not":["01101","C"], # Performs bitwise NOT of reg2. Stores the result in reg1.
    "cmp":["01110","C"], # Compares reg1 and reg2 and sets up the FLAGS register.
    "jmp":["01111","E"], # Jumps to mem_addr, where mem_addr is a memory address.
-   "jlt":["10000","E"], # Jump to mem_addr if the less than flag is set (less than flag = 1), where mem_addr is a memory address.
-   "jgt":["10001","E"], # Jump to mem_addr if the greater than flag is set (greater than flag = 1), where mem_addr is a memory address.
-   "je":["10010","E"], # Jump to mem_addr if the equal flag is set (equal flag = 1), where mem_addr is a memory address.
-   "hlt":["10011","F"] # Stops the machine from executing until reset
+   "jlt":["11100","E"], # Jump to mem_addr if the less than flag is set (less than flag = 1), where mem_addr is a memory address.
+   "jgt":["11101","E"], # Jump to mem_addr if the greater than flag is set (greater than flag = 1), where mem_addr is a memory address.
+   "je":["11111","E"], # Jump to mem_addr if the equal flag is set (equal flag = 1), where mem_addr is a memory address.
+   "hlt":["11010","F"] # Stops the machine from executing until reset
 }
 opr_sym = ["add","sub","mov","ld","st","mul","div","rs","ls",
                    "xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt"]
